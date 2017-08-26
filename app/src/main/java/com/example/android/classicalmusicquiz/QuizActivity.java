@@ -50,7 +50,6 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
-// TODO (1): Have this Activity implement ExoPlayer.EventListener and add the required methods. (DONE)
 public class QuizActivity extends AppCompatActivity implements View.OnClickListener, ExoPlayer.EventListener {
 
     private static final int CORRECT_ANSWER_DELAY_MILLIS = 1000;
@@ -108,6 +107,9 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
         // Initialize the buttons with the composers names.
         mButtons = initializeButtons(mQuestionSampleIDs);
+
+        // TODO (1): Create a method to initialize the MediaSession. It should create the MediaSessionCompat object, set the flags for external clients, set the available actions you want to support, and start the session.
+        // TODO (2): Create an inner class that extends MediaSessionCompat.Callbacks, and override the onPlay(), onPause(), and onSkipToPrevious() callbacks. Pass an instance of this class into the MediaSession.setCallback() method in the method you created in TODO 1.
         
         Sample answerSample = Sample.getSampleByID(this, mAnswerSampleID);
 
@@ -156,10 +158,9 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
 
-            // TODO (2): Set the ExoPlayer.EventListener to this activity (DONE)
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
-
+            
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(this, "ClassicalMusicQuiz");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
@@ -265,42 +266,42 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
      */
     @Override
     protected void onDestroy() {
+        // TODO (4): When the activity is destroyed, set the MediaSession to inactive.
         super.onDestroy();
         releasePlayer();
     }
 
+    
+    // ExoPlayer Event Listeners
+
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-
     }
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
     }
 
     @Override
     public void onLoadingChanged(boolean isLoading) {
-
     }
 
-    // TODO (3): Add conditional logging statements to the onPlayerStateChanged() method that log when ExoPlayer is playing or paused. (DONE)
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if((playbackState == ExoPlayer.STATE_READY) && playWhenReady){
+            // TODO (3): When ExoPlayer is playing, update the PlayBackState.
             Log.d(TAG, "onPlayerStateChanged: PLAYING");
         } else if((playbackState == ExoPlayer.STATE_READY)){
+            // TODO (3): When ExoPlayer is paused, update the PlayBackState.
             Log.d(TAG, "onPlayerStateChanged: PAUSED");
         }
     }
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-
     }
 
     @Override
     public void onPositionDiscontinuity() {
-
     }
 }
