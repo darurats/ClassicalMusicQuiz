@@ -18,6 +18,8 @@ package com.example.android.classicalmusicquiz;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -69,9 +71,10 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private Button[] mButtons;
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
-    private MediaSessionCompat mMediaSession;
+    private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,7 +190,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         return buttons;
     }
 
-    // TODO (1): Create a method that shows a MediaStyle notification with two actions (play/pause, skip to previous). Clicking on the notification should launch this activity. It should take one argument that defines the state of MediaSession. (DONE)
+
     /**
      * Shows Media Style notification, with an action that depends on the current MediaSession
      * PlaybackState.
@@ -236,6 +239,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         mNotificationManager.notify(0, builder.build());
     }
 
+
     /**
      * Initialize ExoPlayer.
      * @param mediaUri The URI of the sample to play.
@@ -265,6 +269,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
      * Release ExoPlayer.
      */
     private void releasePlayer() {
+        mNotificationManager.cancelAll();
         mExoPlayer.stop();
         mExoPlayer.release();
         mExoPlayer = null;
@@ -378,7 +383,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Method that is called when the ExoPlayer state changes. Used to update the MediaSession
-     * PlayBackState to keep in sync.
+     * PlayBackState to keep in sync, and post the media notification.
      * @param playWhenReady true if ExoPlayer is playing, false if it's paused.
      * @param playbackState int describing the state of ExoPlayer. Can be STATE_READY, STATE_IDLE,
      *                      STATE_BUFFERING, or STATE_ENDED.
@@ -393,8 +398,6 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                     mExoPlayer.getCurrentPosition(), 1f);
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
-
-        // TODO (2): Call the method to show the notification, passing in the PlayBackStateCompat object. (DONE)
         showNotification(mStateBuilder.build());
     }
 
@@ -423,6 +426,21 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onSkipToPrevious() {
             mExoPlayer.seekTo(0);
+        }
+    }
+
+    // TODO (1): Create a static inner class that extends Broadcast Receiver and implement the onReceive() method. (DONE)
+    /**
+     * Broadcast Receiver registered to receive the MEDIA_BUTTON intent coming from clients.
+     */
+    public static class MediaReceiver extends BroadcastReceiver {
+
+        public MediaReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MediaButtonReceiver.handleIntent(mMediaSession, intent);
         }
     }
 }
